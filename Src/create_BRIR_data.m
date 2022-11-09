@@ -31,6 +31,8 @@ function BRIR_data = create_BRIR_data (varargin)
 %               float - default: (-180:1:180)'.
 %       - ElOrient: Vector with the azimuth angles to render [N x 1] -
 %               float - default: (-90:5:90)'.
+%       - NormalizationMode: Normalize to 'direct', 'direct+early' or 'full'
+%               string - default: 'none'
 %       - Attenuation: Attenuation factor on the rendered BRIR (in dB) -
 %               float - default: 0.0.
 %       - TimeGuard: Time (in seconds) greater than the propagation time in
@@ -76,8 +78,8 @@ function BRIR_data = create_BRIR_data (varargin)
 listNames = {'fs','HRTF_Subject','HRTF_Type','HRTF_Path',...
     'ExportSofaFlag','ExportWavFlag','ExportDSERcFlag','ExportDSERsFlag',...
     'DestinationPath','Length','Split','MixingTime','AzOrient','ElOrient',...
-    'RenderingCondition','Attenuation','QuantizeDOAFlag','DOADirections',...
-    'DOAAzOffset','DOAElOffset','BandsPerOctave','EqTxx','RTModRegFreq'};
+    'RenderingCondition','NormalizationMode', 'Attenuation','QuantizeDOAFlag','DOADirections',...
+    'DOAAzOffset','DOAElOffset','BandsPerOctave','EqTxx','RTModRegFreq', 'RTModMode'};
 
 for i = 1:2:length(varargin)
     if ~any(strcmpi(listNames,varargin{i}))
@@ -111,6 +113,7 @@ BRIR_data.Split = true;
 BRIR_data.Length = 0.0;
 BRIR_data.TimeGuard = 0.01;
 
+BRIR_data.NormalizationMode = 'none';
 BRIR_data.Attenuation = 0.0;
 
 BRIR_data.RenderingCondition = 'Original';
@@ -123,6 +126,8 @@ BRIR_data.DOADirections = 50;
 BRIR_data.BandsPerOctave = 3;
 BRIR_data.EqTxx = 30;
 BRIR_data.RTModRegFreq = false;
+
+BRIR_data.RTModMode = 'Txx';
 
 BRIR_data.ExportSofaFlag = true;
 BRIR_data.ExportWavFlag = false;
