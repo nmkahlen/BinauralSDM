@@ -80,6 +80,13 @@ If you use this code in your research, please cite the following [paper](https:/
 
 ## Changelog
 
+### 2022-11-09  
+- Added `Normalize` function. Allows for normalizing responses to A weighted direct sound, direct sound and early reflections or full response  
+- Added `Modify_Reverb_Slope_EDC` and example. This is an alternative to RT estimation based whitening correction and avoids possible artefects to to 
+inaccurate RT estimation in small bands  
+- Speedup in `Synthesize_SDM_Binaural.m` when quantization is used. By only searching for unique positions in the HRTF set, rendering is x20 faster in the example  
+
+
 ### 2022-08-30 - v0.5
 - Add `Save_BRIR_sofa.m` to export rendered BRIRs as SOFA-file (activated by default over exporting individual WAV-files with according changes for new flags in `create_BRIR_data.m`)
 - Rename `SaveBRIR.m` into `Save_BRIR_wav.m`
