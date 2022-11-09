@@ -6,7 +6,9 @@ function [BRIR_mod_early, BRIR_mod_late] = Modify_Reverb_Slope_EDC(BRIR_data, P,
 %
 %   Input parameters:
 %       - BRIR_data: Struct containing BRIR configuration data.
-%       - BRIR_TimeData: Binaural room impulse response to be modified.
+%       - P: Pressure response
+%       - BRIR_early: Early part of Binaural room impulse response to be modified.
+%       - BRIR_late: Early part of Binaural room impulse response to be modified.
 %       - Plot_data: Struct containing Plot configuration data - optional.
 %   Output parameters:
 %       - BRIR_mod: Binaural room impulse response with the modified reverb.
