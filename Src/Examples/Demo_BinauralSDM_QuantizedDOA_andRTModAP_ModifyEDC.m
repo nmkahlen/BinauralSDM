@@ -130,11 +130,11 @@ RTModRegFreq     = false;           % Regularization frequncy in Hz above which 
 RTModMode       = 'EDC';            % 'Txx' or 'EDC'
 NamingCond       = sprintf('Quantized%dDOA', DOADirections); % String used for naming purposes, useful when rendering variations of the sasme RIR.
 BRIR_Length      = 0.0;             % Length of BRIR in seconds, will be chosen by analysis of the room reverberation time if unspecified.
-NormalizationMode = 'direct+early';        % Normalization. default: none.
+NormalizationMode = 'none';         % Normalization. default: none.
 BRIR_Atten       = 30;              % Attenuation of the rendered BRIRs (in dB). Useful to avoid clipping. Use the same value when rendering various
                                     % positions in the same room to maintain relative level differences.
-AzOrient         = (-5:5:5)';       % Render BRIRs every 2 degrees in azimuth.
-ElOrient         = (-45:15:45)';        % Render BRIRs every 5 degrees in elevation.
+AzOrient         = (-180:2:180)';   % Render BRIRs every 2 degrees in azimuth.
+ElOrient         = (-90:5:90)';     % Render BRIRs every 5 degrees in elevation.
 PlotAnalysisFlag = true;            % Flag to determine if analysis results should be plotted.
 PlotExportFlag   = true;            % Flag to determine if analysis result plots should be exported.
 ExportSofaFlag   = false;           % Flag to determine if BRIRs should be exported in a SOFA-file.
