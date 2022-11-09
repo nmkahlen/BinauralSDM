@@ -13,8 +13,8 @@ function [BRIR_mod_early, BRIR_mod_late] = Modify_Reverb_Slope_EDC(BRIR_data, P,
 %   Output parameters:
 %       - BRIR_mod: Binaural room impulse response with the modified reverb.
 %
-%   Author: Sebastia V. Amengual
-%   Last modified: 11/17/2021
+%   Author: Nils Meyer-Kahlen
+%   Last modified: 11/09/2022
 
 PLOT_FMT = 'pdf';
 
