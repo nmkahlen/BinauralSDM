@@ -1,6 +1,6 @@
 % Copyright (c) Facebook, Inc. and its affiliates.
 
-function [BRIR_mod_early, BRIR_mod_late] = Modify_Reverb_Slope_EDC(BRIR_data, P, BRIR_early, BRIR_late, Plot_data)
+function [BRIR_mod_early, BRIR_mod_late] = Modify_Reverb_Slope_EDC(BRIR_data, SRIR_data, BRIR_early, BRIR_late, Plot_data)
 % This function decomposes a BRIR into several bands and modifies the decay
 % slope of each band according to the input parameters.
 %
@@ -15,6 +15,7 @@ function [BRIR_mod_early, BRIR_mod_late] = Modify_Reverb_Slope_EDC(BRIR_data, P,
 %
 %   Author: Sebastia V. Amengual
 %   Last modified: 11/17/2021
+
 
 PLOT_FMT = 'pdf';
 
@@ -39,6 +40,12 @@ end
 
 % application of filterbank:  
 
+if SRIR_data.fs ~= BRIR_data.fs
+    P = resample(SRIR_data.P_RIR, BRIR_data.fs, SRIR_data.fs);
+else
+    P = SRIR_data.P_RIR;
+end
+
 H_freq = fft(BRIR, 2*BRIR_data.FilterBank_snfft);
 P_freq =  fft(P, 2*BRIR_data.FilterBank_snfft);
 
@@ -46,28 +53,34 @@ G = fft(BRIR_data.FilterBank_g, 2*BRIR_data.FilterBank_snfft);
 
 BRIR_mod = zeros(size(BRIR));
 
+correctionEnvelope = zeros(size(BRIR, 1), length(BRIR_data.FilterBank_f1));
+
 for band = 1 : length(BRIR_data.FilterBank_f1)
 
-    % Filter the result with octave band filter
-    y = real(ifft(G(:, band) .* H_freq));
     p =  real(ifft(G(:, band) .* P_freq));
-    
-    y = y(BRIR_data.FilterBank_snfft+1:end, :, :);
     p = p(BRIR_data.FilterBank_snfft+1:end, :);
-
-    H_filt = y(1:BRIR_data.FilterBank_snfft, :, :);
     P_filt = p(1:BRIR_data.FilterBank_snfft, :);
-   
-    % mean EDC over all directions. 
-    % Also possible: Compensation per direction
-    EDC_H = mean(flipud(cumsum(flipud(H_filt.^2))), [2, 3]);
     EDC_P = flipud(cumsum(flipud(P_filt.^2)));
 
+    EDC_H = zeros(size(BRIR, 1), 1);
+
+    for iDir = 1:size(BRIR, 3)
+
+    % Filter the result with octave band filter
+    y = real(ifft(G(:, band) .* H_freq(:, :, iDir)));
+    y = y(BRIR_data.FilterBank_snfft+1:end, :);
+    H_filt = y(1:BRIR_data.FilterBank_snfft, :);
+   
+    % mean EDC over all directions
+    EDC_H = EDC_H + mean(flipud(cumsum(flipud(H_filt.^2))), [2]) / size(H_freq, 3);
+
+    end
+
     correctionEnvelope(:, band) = sqrt(EDC_P) ./ sqrt(EDC_H);
-    
+
     H_corrected = H_filt .* correctionEnvelope(:, band);
-    
     BRIR_mod = BRIR_mod + H_corrected;
+    
 end
 
 BRIR_mod_early = BRIR_mod(1:lenBrir_early, :, :);
@@ -80,6 +93,9 @@ if ~isempty(Plot_data) && Plot_data.PlotAnalysisFlag
     figure, plot(db(correctionEnvelope))
     legend(num2str(round(BRIR_data.RTFreqVector')))
     title('EDC correction function')
+
+    [reverb_time_after_mod, ~, BRIR_data.RTFreqVector] = ...
+    GetReverbTime(SRIR_data, BRIR_mod(:, :, 1), BRIR_data.BandsPerOctave, BRIR_data.EqTxx);
 
     BRIR_plot = BRIR(:, :, 1);
     BRIR_plot(1:floor(BRIR_data.MixingTime * Plot_data.fs), :) = 0;
@@ -125,11 +141,11 @@ if ~isempty(Plot_data) && Plot_data.PlotAnalysisFlag
     semilogx(BRIR_data.RTFreqVector, BRIR_data.OriginalT30, 'LineWidth', 2, 'Color', 'k');
     hold on;
     if BRIR_data.RTModRegFreq
-        semilogx(BRIR_data.RTFreqVector, BRIR_data.DesiredT30_unlimited, ...
+        semilogx(BRIR_data.RTFreqVector, reverb_time_after_mod, ...
             'LineStyle', ':', 'LineWidth', 2, 'Color', Plot_data.colors(4, :));
         lgd_str = {lgd_str{1}, 'after (unregularized)', lgd_str{2}};
     end
-    semilogx(BRIR_data.RTFreqVector, BRIR_data.DesiredT30, 'LineWidth', 2, 'Color', Plot_data.colors(4, :));
+    semilogx(BRIR_data.RTFreqVector, reverb_time_after_mod, 'LineWidth', 2, 'Color', Plot_data.colors(4, :));
     xlim([BRIR_data.RTFreqVector(1) / 1.1, BRIR_data.RTFreqVector(end) * 1.1]);
     yl = ylim;
     ylim([floor(yl(1) * 10) / 10, ceil(yl(2) * 10) / 10]);
