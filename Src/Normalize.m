@@ -2,8 +2,8 @@
 
 function [BRIR_DSER, BRIR_LR, BRIR_DS, BRIR_ER] = Normalize(BRIR_data, BRIR_DSER, BRIR_LR, BRIR_DS, BRIR_ER)
 % This function normalizes the response to the frontal direction,
-% either to direct sound, direct sound and early reflections, or overall. Always done to frontal
-% directions. A-weighting is used.
+% either to direct sound, direct sound and early reflections, or overall. 
+% Always done to frontaldirections. A-weighting is used.
 
 %   Author: Nils Meyer-Kahlen
 %   Last modified: 11/09/2022
